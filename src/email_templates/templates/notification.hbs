@@ -1,0 +1,28 @@
+<h2>{{notificationTitle}}</h2>
+
+<p>Dear {{userName}},</p>
+
+<p>{{{message}}}</p>
+
+{{#if isUrgent}}
+{{> highlight-box title="Urgent Notice" content="This notification requires your immediate attention."}}
+{{/if}}
+
+{{#if actionRequired}}
+<h3>Action Required</h3>
+<p>{{actionDescription}}</p>
+
+{{#if actionUrl}}
+{{> button url=actionUrl text=actionButtonText}}
+{{/if}}
+{{/if}}
+
+{{#if additionalInfo}}
+<h3>Additional Information</h3>
+<p>{{{additionalInfo}}}</p>
+{{/if}}
+
+<p>If you have any questions about this notification, please contact our support team.</p>
+
+<p>Best regards,<br>
+<strong>The {{companyName}} Team</strong></p>

@@ -1,0 +1,174 @@
+### Get User by ID
+GET http://localhost:3000/users/3
+Content-Type: application/json
+
+### Get All Users
+GET http://localhost:3000/users
+Content-Type: application/json
+
+### Create New User
+POST http://localhost:3000/users
+Content-Type: application/json
+
+{
+    "name": "Abdul",
+    "email": "abdul123@gmail.com",
+    "password": "yourpassword"
+}
+
+### Delete User by ID
+DELETE http://localhost:3000/users/2
+
+### User login
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "email": "abdul123@gmail.com",
+    "password": "yourpassword"
+}
+
+### User logout
+POST http://localhost:3000/auth/logout
+
+
+### new school onboarding
+POST http://localhost:3000/onboarding/submit
+Content-Type: application/json
+
+{
+    "name": "New School7",
+    "phone": "123-456-7890",
+    "logo": "https://example.com/logo.png",
+    "website": "https://example.com",
+    "supportEmail": "support@example.com",
+    "address": {
+        "street": "123 Main St",
+        "street2": "Suite 100",
+        "city": "Anytown",
+        "state": "CA",
+        "zipCode": "12345"
+    },
+    "businessOwnerInformation": {
+        "name": "John Doe",
+        "email": "abdulamite@gmail.com",
+        "phone": "123-456-7890"
+    }
+}
+
+### Queue Health Check
+GET http://localhost:3000/queue/health
+
+### Get Queue Worker Status
+GET http://localhost:3000/queue/worker/status
+
+### Stop Queue Worker
+POST http://localhost:3000/queue/worker/control
+Content-Type: application/json
+
+{
+    "action": "stop"
+}
+
+### Start Queue Worker
+POST http://localhost:3000/queue/worker/control
+Content-Type: application/json
+
+{
+    "action": "start"
+}
+
+### Test Queue Flow (Send Message - Worker Will Process Automatically)
+POST http://localhost:3000/queue/test
+Content-Type: application/json
+
+{
+    "message": "Hello from my queue test!",
+    "jobType": "email-processing",
+    "delay": 0
+}
+
+### Test Welcome Email Job
+POST http://localhost:3000/queue/test
+Content-Type: application/json
+
+{
+    "message": "Welcome email test",
+    "jobType": "welcome-email",
+    "delay": 0
+}
+
+### Test Bulk Queue (Send Multiple Messages)
+POST http://localhost:3000/queue/test/bulk
+Content-Type: application/json
+
+{
+    "count": 3
+}
+
+### Process All Available Messages (Manual - Not Needed with Worker)
+GET http://localhost:3000/queue/test/process-all
+
+### Get Available Email Templates
+GET http://localhost:3000/email/templates
+
+### Test Welcome Email Template
+POST http://localhost:3000/email/test/welcome
+Content-Type: application/json
+
+{
+    "email": "abdulamite@gmail.com",
+    "userName": "Abdul",
+    "actionUrl": "https://yourcompany.com/dashboard"
+}
+
+### Test School Welcome Email Template
+POST http://localhost:3000/email/test/school-welcome
+Content-Type: application/json
+
+{
+    "email": "abdulamite@gmail.com",
+    "schoolName": "Test Elementary School",
+    "ownerName": "Abdul Amite",
+    "schoolPhone": "123-456-7890",
+    "schoolWebsite": "https://testelementary.edu",
+    "dashboardUrl": "https://yourcompany.com/school/dashboard"
+}
+
+### Test Password Reset Email Template
+POST http://localhost:3000/email/test/password-reset
+Content-Type: application/json
+
+{
+    "email": "abdulamite@gmail.com",
+    "userName": "Abdul"
+}
+
+### Test Notification Email Template
+POST http://localhost:3000/email/test/notification
+Content-Type: application/json
+
+{
+    "email": "abdulamite@gmail.com",
+    "userName": "Abdul",
+    "title": "Important Account Update",
+    "message": "Your account settings have been updated. Please review the changes and ensure everything is correct.",
+    "isUrgent": true,
+    "actionRequired": true,
+    "actionUrl": "https://yourcompany.com/account/review"
+}
+
+### Test Custom Template
+POST http://localhost:3000/email/test/custom
+Content-Type: application/json
+
+{
+    "email": "abdulamite@gmail.com",
+    "templateName": "welcome",
+    "subject": "Custom Welcome Message",
+    "templateData": {
+        "userName": "Custom User",
+        "companyName": "My Custom Company",
+        "actionUrl": "https://mycustomcompany.com/start"
+    }
+}

@@ -1,0 +1,36 @@
+<h2>Welcome to {{companyName}}!</h2>
+
+<p>Dear {{ownerName}},</p>
+
+<p>Congratulations! <strong>{{schoolName}}</strong> has been successfully onboarded to our school management platform.</p>
+
+{{> highlight-box title="Your School is Ready!" content="All your school information has been set up and you can now begin managing your educational institution with our comprehensive tools."}}
+
+<h3>What's Next?</h3>
+<ul>
+    <li>Set up your school profile and customize settings</li>
+    <li>Add teachers and staff members</li>
+    <li>Configure classes and curriculum</li>
+    <li>Begin managing student enrollment</li>
+    <li>Explore our reporting and analytics features</li>
+</ul>
+
+<h3>School Information</h3>
+<p><strong>School Name:</strong> {{schoolName}}</p>
+{{#if schoolPhone}}
+<p><strong>Phone:</strong> {{schoolPhone}}</p>
+{{/if}}
+{{#if schoolWebsite}}
+<p><strong>Website:</strong> <a href="{{schoolWebsite}}">{{schoolWebsite}}</a></p>
+{{/if}}
+
+{{#if dashboardUrl}}
+{{> button url=dashboardUrl text="Access Your Dashboard"}}
+{{/if}}
+
+<p>Our support team is here to help you get started. If you have any questions or need assistance setting up your school, please don't hesitate to reach out.</p>
+
+<p>We're excited to support {{schoolName}} on this journey!</p>
+
+<p>Best regards,<br>
+<strong>The {{companyName}} Team</strong></p>
