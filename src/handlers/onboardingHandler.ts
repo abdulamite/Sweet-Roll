@@ -1,7 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { OnboardingFormDataSchool } from '../models/school';
 import { createNewSchool } from '../repo/school';
-import { FROM_EMAIL_MASTERLIST, ResendService } from '../lib/resend/client';
 
 export class OnboardingHandler {
   static async processOnboardingForm(
@@ -23,19 +22,30 @@ export class OnboardingHandler {
       // Create the school
       const newSchool = await createNewSchool(formData);
 
+      // Queue welcome email for school owner (async processing)
       try {
-        const resendService = new ResendService();
-        await resendService.sendWelcomeEmail(
+        const notificationService = (request.server as any).notifications;
+        const messageId = await notificationService.sendSchoolWelcomeEmail(
           formData.businessOwnerInformation.email,
-          formData.businessOwnerInformation.name
+          formData.name,
+          formData.businessOwnerInformation.name,
+          {
+            schoolPhone: formData.phone,
+            schoolWebsite: formData.website,
+            dashboardUrl: `${process.env.FRONTEND_URL}/school/dashboard`,
+            companyName: 'Your School Management Platform',
+            supportEmail: formData.supportEmail,
+          }
         );
+
         request.log.info(
-          `School welcome email sent to ${formData.businessOwnerInformation.email}`
+          `School welcome email queued for ${formData.businessOwnerInformation.email}, messageId: ${messageId}`
         );
       } catch (emailError) {
         // Log email error but don't fail the onboarding process
+        // The email will be retried by the queue system
         request.log.error(
-          `Failed to send welcome email: ${emailError instanceof Error ? emailError.message : 'Unknown error'}`
+          `Failed to queue welcome email: ${emailError instanceof Error ? emailError.message : 'Unknown error'}`
         );
       }
 

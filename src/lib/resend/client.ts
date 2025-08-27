@@ -1,7 +1,5 @@
 import { Resend } from 'resend';
-import EmailTemplateRenderer, {
-  TemplateConfig,
-} from '../email/templateRenderer';
+import EmailTemplateRenderer from '../email/templateRenderer';
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
 const templateRenderer = new EmailTemplateRenderer();

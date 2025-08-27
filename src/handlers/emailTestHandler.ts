@@ -1,5 +1,4 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { ResendService } from '../lib/resend/client';
 
 export class EmailTestHandler {
   /**
@@ -20,9 +19,9 @@ export class EmailTestHandler {
         });
       }
 
-      const resendService = new ResendService();
+      const notificationService = (request.server as any).notifications;
 
-      const messageId = await resendService.sendWelcomeEmail(
+      const messageId = await notificationService.sendWelcomeEmail(
         email,
         userName || 'Test User',
         {
@@ -34,17 +33,19 @@ export class EmailTestHandler {
 
       reply.send({
         success: true,
-        message: 'Welcome email sent successfully',
+        message:
+          'Welcome email queued successfully (will be sent within 10 seconds)',
         messageId,
         template: 'welcome',
+        note: 'This email is now processed asynchronously via SQS',
       });
     } catch (error) {
       request.log.error(
-        `Failed to send welcome email: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Failed to queue welcome email: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
       reply.code(500).send({
         success: false,
-        error: 'Failed to send welcome email',
+        error: 'Failed to queue welcome email',
         details: error instanceof Error ? error.message : 'Unknown error',
       });
     }
@@ -81,9 +82,19 @@ export class EmailTestHandler {
         });
       }
 
-      const resendService = new ResendService();
+      const notificationService = (request.server as any).notifications;
 
-      const messageId = await resendService.sendSchoolWelcomeEmail(
+      // Debug: Check what we actually got
+      console.log('notificationService:', notificationService);
+      console.log('notificationService type:', typeof notificationService);
+      if (notificationService) {
+        console.log(
+          'notificationService methods:',
+          Object.getOwnPropertyNames(Object.getPrototypeOf(notificationService))
+        );
+      }
+
+      const messageId = await notificationService.sendSchoolWelcomeEmail(
         email,
         schoolName || 'Test School',
         ownerName || 'School Administrator',
@@ -98,9 +109,11 @@ export class EmailTestHandler {
 
       reply.send({
         success: true,
-        message: 'School welcome email sent successfully',
+        message:
+          'School welcome email queued successfully (will be sent within 10 seconds)',
         messageId,
         template: 'school-welcome',
+        note: 'This email is now processed asynchronously via SQS',
       });
     } catch (error) {
       request.log.error(
@@ -134,12 +147,12 @@ export class EmailTestHandler {
         });
       }
 
-      const resendService = new ResendService();
+      const notificationService = (request.server as any).notifications;
 
       // Generate a fake reset token for testing
       const fakeResetToken = 'test-reset-token-' + Date.now();
 
-      const messageId = await resendService.sendPasswordResetEmail(
+      const messageId = await notificationService.sendPasswordResetEmail(
         email,
         fakeResetToken,
         userName || 'Test User',
@@ -152,10 +165,11 @@ export class EmailTestHandler {
 
       reply.send({
         success: true,
-        message: 'Password reset email sent successfully',
+        message:
+          'Password reset email queued successfully (will be sent within 10 seconds)',
         messageId,
         template: 'password-reset',
-        note: 'This is a test email with a fake reset token',
+        note: 'This is a test email with a fake reset token, now processed asynchronously via SQS',
       });
     } catch (error) {
       request.log.error(
@@ -202,9 +216,9 @@ export class EmailTestHandler {
         });
       }
 
-      const resendService = new ResendService();
+      const notificationService = (request.server as any).notifications;
 
-      const messageId = await resendService.sendNotificationEmail(
+      const messageId = await notificationService.sendNotificationEmail(
         email,
         title || 'Test Notification',
         message ||
@@ -225,9 +239,11 @@ export class EmailTestHandler {
 
       reply.send({
         success: true,
-        message: 'Notification email sent successfully',
+        message:
+          'Notification email queued successfully (will be sent within 10 seconds)',
         messageId,
         template: 'notification',
+        note: 'This email is now processed asynchronously via SQS',
       });
     } catch (error) {
       request.log.error(
@@ -249,6 +265,8 @@ export class EmailTestHandler {
     reply: FastifyReply
   ) {
     try {
+      // For template listing, we can use ResendService directly since it's not sending emails
+      const { ResendService } = await import('../lib/resend/client');
       const resendService = new ResendService();
       const templates = resendService.getAvailableTemplates();
 
@@ -256,6 +274,7 @@ export class EmailTestHandler {
         success: true,
         templates,
         count: templates.length,
+        note: 'Template listing is synchronous - only actual email sending is async',
       });
     } catch (error) {
       request.log.error(
@@ -290,7 +309,10 @@ export class EmailTestHandler {
           error: 'Email, templateName, and subject are required',
         });
       }
+      const notificationService = (request.server as any).notifications;
 
+      // For template validation, we can use ResendService directly since it's not sending emails
+      const { ResendService } = await import('../lib/resend/client');
       const resendService = new ResendService();
 
       if (!resendService.templateExists(templateName)) {
@@ -301,19 +323,21 @@ export class EmailTestHandler {
         });
       }
 
-      const messageId = await resendService.sendTemplatedEmail({
-        to: email,
+      const messageId = await notificationService.sendTemplatedEmail(
+        email,
         templateName,
         subject,
-        templateData: templateData || {},
-        from: 'NOREPLY',
-      });
+        templateData || {},
+        'NOREPLY'
+      );
 
       reply.send({
         success: true,
-        message: 'Custom template email sent successfully',
+        message:
+          'Custom template email queued successfully (will be sent within 10 seconds)',
         messageId,
         template: templateName,
+        note: 'This email is now processed asynchronously via SQS',
       });
     } catch (error) {
       request.log.error(

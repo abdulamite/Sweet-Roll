@@ -1,3 +1,147 @@
+import { ResendService } from '../resend/client';
+
+/**
+ * Email job handlers for processing different types of email jobs
+ * These handlers will be called by the queue worker to actually send emails
+ */
+export class EmailJobHandlers {
+  private resendService: ResendService;
+
+  constructor() {
+    this.resendService = new ResendService();
+  }
+
+  /**
+   * Handle welcome email jobs
+   */
+  async handleWelcomeEmail(jobData: any) {
+    const { email, userName, options } = jobData;
+
+    console.log(`Processing welcome email job for: ${email}`);
+
+    try {
+      const messageId = await this.resendService.sendWelcomeEmail(
+        email,
+        userName,
+        options
+      );
+
+      console.log(
+        `Welcome email sent successfully to: ${email}, messageId: ${messageId}`
+      );
+    } catch (error) {
+      console.error(`Failed to send welcome email to ${email}:`, error);
+      throw error; // Re-throw to let queue handle retry logic
+    }
+  }
+
+  /**
+   * Handle school welcome email jobs
+   */
+  async handleSchoolWelcomeEmail(jobData: any) {
+    const { email, schoolName, ownerName, options } = jobData;
+
+    console.log(`Processing school welcome email job for: ${email}`);
+
+    try {
+      const messageId = await this.resendService.sendSchoolWelcomeEmail(
+        email,
+        schoolName,
+        ownerName,
+        options
+      );
+
+      console.log(
+        `School welcome email sent successfully to: ${email}, messageId: ${messageId}`
+      );
+    } catch (error) {
+      console.error(`Failed to send school welcome email to ${email}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Handle password reset email jobs
+   */
+  async handlePasswordResetEmail(jobData: any) {
+    const { email, resetToken, userName, options } = jobData;
+
+    console.log(`Processing password reset email job for: ${email}`);
+
+    try {
+      const messageId = await this.resendService.sendPasswordResetEmail(
+        email,
+        resetToken,
+        userName,
+        options
+      );
+
+      console.log(
+        `Password reset email sent successfully to: ${email}, messageId: ${messageId}`
+      );
+    } catch (error) {
+      console.error(`Failed to send password reset email to ${email}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Handle notification email jobs
+   */
+  async handleNotificationEmail(jobData: any) {
+    const { email, notificationTitle, message, userName, options } = jobData;
+
+    console.log(`Processing notification email job for: ${email}`);
+
+    try {
+      const messageId = await this.resendService.sendNotificationEmail(
+        email,
+        notificationTitle,
+        message,
+        userName,
+        options
+      );
+
+      console.log(
+        `Notification email sent successfully to: ${email}, messageId: ${messageId}`
+      );
+    } catch (error) {
+      console.error(`Failed to send notification email to ${email}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Handle custom templated email jobs
+   */
+  async handleTemplatedEmail(jobData: any) {
+    const { email, templateName, subject, templateData, from, layout } =
+      jobData;
+
+    console.log(
+      `Processing templated email job for: ${email}, template: ${templateName}`
+    );
+
+    try {
+      const messageId = await this.resendService.sendTemplatedEmail({
+        to: email,
+        templateName,
+        subject,
+        templateData,
+        from,
+        layout,
+      });
+
+      console.log(
+        `Templated email sent successfully to: ${email}, messageId: ${messageId}`
+      );
+    } catch (error) {
+      console.error(`Failed to send templated email to ${email}:`, error);
+      throw error;
+    }
+  }
+}
+
 /**
  * General utility job handlers
  */
