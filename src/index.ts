@@ -1,6 +1,7 @@
 import Fastify from 'fastify';
 import registerRoutes from './routes';
 import fp from 'fastify-plugin';
+import dbService from './plugins/database';
 
 const fastify = Fastify({ logger: true });
 
@@ -14,6 +15,9 @@ fastify.register(require('@fastify/multipart')); // For file uploads
 fastify.register(import('@fastify/cookie'), {
   secret: 'my-secret',
 });
+
+// Register database service plugin
+fastify.register(dbService);
 
 // Register third-party services as plugins BEFORE routes
 fastify.register(
@@ -31,13 +35,6 @@ fastify.register(
     const notificationService = new NotificationService();
     const queueService = new QueueService();
     const queueWorker = new QueueWorker(10000); // Poll every 10 seconds
-
-    // Debug: Check if NotificationService was created properly
-    console.log('NotificationService instance:', notificationService);
-    console.log(
-      'NotificationService methods:',
-      Object.getOwnPropertyNames(Object.getPrototypeOf(notificationService))
-    );
 
     // Initialize job handlers
     const emailHandlers = new EmailJobHandlers();

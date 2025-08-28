@@ -1,8 +1,9 @@
-export interface OnboardingFormDataSchool {
-  id: number;
+import { BaseModel } from './baseMode';
+
+export interface OnboardingFormDataSchool extends BaseModel {
   name: string;
   phone: string;
-  logo: string;
+  logo: string | null;
   website: string;
   supportEmail: string;
   onboardingStatus: 'pending' | 'completed' | 'in_progress';

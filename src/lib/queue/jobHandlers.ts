@@ -39,7 +39,13 @@ export class EmailJobHandlers {
    * Handle school welcome email jobs
    */
   async handleSchoolWelcomeEmail(jobData: any) {
-    const { email, schoolName, ownerName, options } = jobData;
+    const {
+      email,
+      schoolName,
+      ownerName,
+      options,
+      adminUserAccountActivationToken,
+    } = jobData;
 
     console.log(`Processing school welcome email job for: ${email}`);
 
@@ -48,6 +54,7 @@ export class EmailJobHandlers {
         email,
         schoolName,
         ownerName,
+        adminUserAccountActivationToken,
         options
       );
 

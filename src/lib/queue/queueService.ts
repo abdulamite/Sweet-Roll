@@ -15,7 +15,7 @@ export class QueueService {
       timestamp: new Date().toISOString(),
       id: uuidv4(),
     };
-
+    console.log(message);
     return await this.client.sendMessage(message, delay);
   }
 

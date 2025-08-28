@@ -6,15 +6,15 @@ Content-Type: application/json
 GET http://localhost:3000/users
 Content-Type: application/json
 
-### Create New User
-POST http://localhost:3000/users
-Content-Type: application/json
+# ### Create New User
+# POST http://localhost:3000/users
+# Content-Type: application/json
 
-{
-    "name": "Abdul",
-    "email": "abdul123@gmail.com",
-    "password": "yourpassword"
-}
+# {
+#     "name": "Abdul",
+#     "email": "abdul123@gmail.com",
+#     "password": "yourpassword"
+# }
 
 ### Delete User by ID
 DELETE http://localhost:3000/users/2
@@ -24,8 +24,8 @@ POST http://localhost:3000/auth/login
 Content-Type: application/json
 
 {
-    "email": "abdul123@gmail.com",
-    "password": "yourpassword"
+    "email": "abdulamite+1@gmail.com",
+    "password": "NewPassword123"
 }
 
 ### User logout
@@ -37,9 +37,8 @@ POST http://localhost:3000/onboarding/submit
 Content-Type: application/json
 
 {
-    "name": "New School7",
+    "name": "New School",
     "phone": "123-456-7890",
-    "logo": "https://example.com/logo.png",
     "website": "https://example.com",
     "supportEmail": "support@example.com",
     "address": {
@@ -50,10 +49,26 @@ Content-Type: application/json
         "zipCode": "12345"
     },
     "businessOwnerInformation": {
-        "name": "John Doe",
-        "email": "abdulamite@gmail.com",
+        "name": "Abdul Alberto-Shaikh",
+        "email": "abdulamite+1@gmail.com",
         "phone": "123-456-7890"
     }
+}
+
+### Activate user account
+POST http://localhost:3000/users/4/activate
+Content-Type: application/json
+
+{
+    "token": "Nuwxovm0Y"
+}
+
+### Create password for new user
+POST http://localhost:3000/users/4/password
+Content-Type: application/json
+
+{
+    "password": "NewPassword123"
 }
 
 ### Queue Health Check
@@ -171,4 +186,12 @@ Content-Type: application/json
         "companyName": "My Custom Company",
         "actionUrl": "https://mycustomcompany.com/start"
     }
+}
+
+### Upload School Logo
+POST  http://localhost:3000/school/logo/upload
+Content-Type: application/json
+
+{
+    "logo": "https://example.com/logo.png"
 }

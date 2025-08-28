@@ -1,0 +1,51 @@
+import { db } from '../db';
+import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import { userPasswords } from '../db/schema';
+import { safeQuery } from '../db/queryBuilder';
+import { UserPassword } from '../models/userPassword';
+import { hashUserPassword } from './user';
+import { eq } from 'drizzle-orm';
+
+export class UserPasswordRepo {
+  constructor(private db: PostgresJsDatabase) {}
+
+  static async findByUserId(userId: number): Promise<UserPassword[] | null> {
+    if (!userId || isNaN(userId)) {
+      throw new Error('Valid user ID is required');
+    }
+
+    const userPasswordsResult = await safeQuery
+      .selectUserPasswords()
+      .where(eq(userPasswords.userId, userId));
+
+    return userPasswordsResult;
+  }
+
+  static async createPassword(
+    userId: number,
+    password: string
+  ): Promise<boolean> {
+    if (!userId || isNaN(userId)) {
+      throw new Error('Valid user ID is required');
+    }
+
+    if (!password) {
+      throw new Error('Password is required');
+    }
+
+    const hashedPassword = await hashUserPassword(password);
+    const [result] = await db
+      .insert(userPasswords)
+      .values({
+        userId,
+        hashedPassword,
+      })
+      .returning();
+
+    if (!result.id) {
+      throw new Error('Failed to create user password');
+    }
+
+    return true;
+  }
+}

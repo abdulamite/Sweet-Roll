@@ -121,6 +121,7 @@ export class ResendService {
     to: string,
     schoolName: string,
     ownerName: string,
+    adminUserAccountActivationToken: string,
     options?: {
       schoolPhone?: string;
       schoolWebsite?: string;
@@ -136,6 +137,7 @@ export class ResendService {
       templateData: {
         schoolName,
         ownerName,
+        adminUserAccountActivationToken,
         schoolPhone: options?.schoolPhone,
         schoolWebsite: options?.schoolWebsite,
         dashboardUrl: options?.dashboardUrl,

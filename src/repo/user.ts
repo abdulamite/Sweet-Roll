@@ -1,73 +1,105 @@
 import { User } from '../models/user';
 import { db } from '../db';
 import { userPasswords, users } from '../db/schema';
-import { eq, isNull } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { createHash } from 'crypto';
 import { safeQuery, softDelete } from '../db/queryBuilder';
+import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
-export const getUserById = async (id: number): Promise<User | null> => {
-  const result = await safeQuery.selectUsers().where(eq(users.id, id));
-  if (!result[0]) return null;
-  const user = result[0];
-  return {
-    id: user.id,
-    name: user.name ?? '',
-    email: user.email ?? '',
-  };
-};
+export interface UserCreationData {
+  name: string;
+  email: string;
+  password?: string;
+}
 
-export const getUserByEmail = async (email: string): Promise<User | null> => {
-  const result = await safeQuery.selectUsers().where(eq(users.email, email));
-  if (!result[0]) return null;
-  const user = result[0];
-  return {
-    id: user.id,
-    name: user.name ?? '',
-    email: user.email ?? '',
-  };
-};
+export class UserRepository {
+  constructor(private db: PostgresJsDatabase) {}
 
-export const getAllUsers = async (): Promise<User[]> => {
-  const result = await safeQuery.selectUsers().where();
-  return result.map(user => ({
-    id: user.id,
-    name: user.name ?? '',
-    email: user.email ?? '',
-  }));
-};
-
-export const createNewUser = async (
-  userData: Omit<User, 'id'>
-): Promise<User> => {
-  if (!userData.password) {
-    throw new Error('Password is required to create a new user.');
+  static async findById(id: number): Promise<User | null> {
+    const result = await safeQuery.selectUsers().where(eq(users.id, id));
+    if (!result[0]) return null;
+    const user = result[0];
+    return {
+      id: user.id,
+      name: user.name ?? '',
+      email: user.email ?? '',
+      createdAt: user.createdAt ?? new Date(),
+      updatedAt: user.updatedAt ?? new Date(),
+      deletedAt: user.deletedAt ?? new Date(),
+    };
   }
 
-  const existingUser = await getUserByEmail(userData.email);
-  if (existingUser) {
-    throw new Error('User with this email already exists.');
+  static async findByEmail(email: string): Promise<User | null> {
+    const result = await safeQuery.selectUsers().where(eq(users.email, email));
+    if (!result[0]) return null;
+    const user = result[0];
+    return {
+      id: user.id,
+      name: user.name ?? '',
+      email: user.email ?? '',
+      createdAt: user.createdAt ?? new Date(),
+      updatedAt: user.updatedAt ?? new Date(),
+      deletedAt: user.deletedAt ?? new Date(),
+    };
   }
 
-  const [newUser] = await db.insert(users).values(userData).returning();
-  await db
-    .insert(userPasswords)
-    .values({
-      userId: newUser.id,
-      hashedPassword: hashUserPassword(userData.password),
-    })
-    .returning();
-  return {
-    id: newUser.id,
-    name: newUser.name ?? '',
-    email: newUser.email ?? '',
-  };
-};
+  static async findAll(): Promise<User[]> {
+    const result = await safeQuery.selectUsers().where();
+    return result.map(user => ({
+      id: user.id,
+      name: user.name ?? '',
+      email: user.email ?? '',
+      createdAt: user.createdAt ?? new Date(),
+      updatedAt: user.updatedAt ?? new Date(),
+      deletedAt: user.deletedAt ?? new Date(),
+    }));
+  }
 
-export const deleteUserById = async (id: number): Promise<boolean> => {
-  const result = await softDelete.user(id).returning();
-  return result.length > 0;
-};
+  static async deleteById(id: number): Promise<boolean> {
+    const result = await softDelete.user(id).returning();
+    return result.length > 0;
+  }
+
+  static async create(userData: UserCreationData): Promise<User> {
+    const existingUser = await this.findByEmail(userData.email);
+    if (existingUser) {
+      throw new Error('User with this email already exists.');
+    }
+
+    const [newUser] = await db
+      .insert(users)
+      .values({
+        name: userData.name,
+        email: userData.email,
+      })
+      .returning();
+
+    // If password is provided, hash and store it
+    if (userData.password) {
+      await db.insert(userPasswords).values({
+        userId: newUser.id,
+        hashedPassword: hashUserPassword(userData.password),
+      });
+    }
+
+    return {
+      id: newUser.id,
+      name: newUser.name ?? '',
+      email: newUser.email ?? '',
+      createdAt: newUser.createdAt ?? new Date(),
+      updatedAt: newUser.updatedAt ?? new Date(),
+      deletedAt: newUser.deletedAt ?? new Date(),
+    };
+  }
+}
 
 export function hashUserPassword(password: string): string {
   return createHash('sha512').update(password).digest('hex');
 }
+
+// Backward compatibility exports - these delegate to the UserRepository methods
+export const getUserById = UserRepository.findById;
+export const getUserByEmail = UserRepository.findByEmail;
+export const getAllUsers = UserRepository.findAll;
+export const deleteUserById = UserRepository.deleteById;
+export const createNewUser = UserRepository.create;

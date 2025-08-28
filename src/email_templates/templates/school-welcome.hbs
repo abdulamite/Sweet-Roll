@@ -1,4 +1,4 @@
-<h2>Welcome to {{companyName}}!</h2>
+<h2>Welcome to SweetRoll!</h2>
 
 <p>Dear {{ownerName}},</p>
 
@@ -22,6 +22,11 @@
 {{/if}}
 {{#if schoolWebsite}}
 <p><strong>Website:</strong> <a href="{{schoolWebsite}}">{{schoolWebsite}}</a></p>
+{{/if}}
+
+{{#if adminUserAccountActivationToken}}
+<p>Before you get started please activate your account using the following token:</p>
+<p><strong>{{adminUserAccountActivationToken}}</strong></p>
 {{/if}}
 
 {{#if dashboardUrl}}

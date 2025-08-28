@@ -84,20 +84,11 @@ export class EmailTestHandler {
 
       const notificationService = (request.server as any).notifications;
 
-      // Debug: Check what we actually got
-      console.log('notificationService:', notificationService);
-      console.log('notificationService type:', typeof notificationService);
-      if (notificationService) {
-        console.log(
-          'notificationService methods:',
-          Object.getOwnPropertyNames(Object.getPrototypeOf(notificationService))
-        );
-      }
-
       const messageId = await notificationService.sendSchoolWelcomeEmail(
         email,
         schoolName || 'Test School',
         ownerName || 'School Administrator',
+        '',
         {
           schoolPhone,
           schoolWebsite,

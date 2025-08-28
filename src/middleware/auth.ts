@@ -19,4 +19,13 @@ export async function authMiddleware(
   if (!sessionData?.expires_at || sessionData.expires_at < new Date()) {
     return reply.code(401).send({ error: 'Unauthorized' });
   }
+
+  // TODO: Implement user context retrieval
+  // const userContext = await getUserContext(sessionData.user_id);
+  // if (!userContext) {
+  //   return reply.code(401).send({ error: 'Unauthorized' });
+  // }
+  (request as any).user = {
+    id: sessionData.userId,
+  }; // Placeholder
 }

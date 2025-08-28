@@ -56,6 +56,7 @@ export class NotificationService {
    * @param email - Recipient email address
    * @param schoolName - Name of the school
    * @param ownerName - Name of the school owner
+   * @param adminUserAccountActivationToken - Account activation token for the admin user
    * @param options - Additional options for the school welcome email
    * @param delay - Optional delay in seconds before processing
    */
@@ -63,6 +64,7 @@ export class NotificationService {
     email: string,
     schoolName: string,
     ownerName: string,
+    adminUserAccountActivationToken: string,
     options?: {
       schoolPhone?: string;
       schoolWebsite?: string;
@@ -76,6 +78,18 @@ export class NotificationService {
       `Queuing school welcome email for: ${email}, school: ${schoolName}`
     );
 
+    // Debug logging
+    console.log('DEBUG - NotificationService.sendSchoolWelcomeEmail received:');
+    console.log('1. email:', email);
+    console.log('2. schoolName:', schoolName);
+    console.log('3. ownerName:', ownerName);
+    console.log(
+      '4. adminUserAccountActivationToken:',
+      adminUserAccountActivationToken
+    );
+    console.log('5. options:', options);
+    console.log('6. delay:', delay);
+
     try {
       const messageId = await this.queueService.enqueueJob(
         'school-welcome-email',
@@ -83,6 +97,7 @@ export class NotificationService {
           email,
           schoolName,
           ownerName,
+          adminUserAccountActivationToken,
           options,
         },
         delay
@@ -286,6 +301,7 @@ export class NotificationService {
               job.email,
               job.data.schoolName,
               job.data.ownerName,
+              job.data.adminUserAccountActivationToken,
               job.data.options,
               job.delay
             );
