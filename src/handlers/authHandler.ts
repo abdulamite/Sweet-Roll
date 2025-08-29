@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { hashUserPassword, UserRepository } from '../repo/user';
+import { hashUserPassword, UserRepo } from '../repo/user';
 import {
   getUserPasswordByUserID,
   setUserSessionToken,
@@ -26,7 +26,7 @@ export class AuthHandler {
       }
 
       // Get user by email
-      const user = await UserRepository.findByEmail(email);
+      const user = await UserRepo.findByEmail(email);
       if (!user) {
         return reply.code(401).send({ error: 'Invalid credentials' });
       }

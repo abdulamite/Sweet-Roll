@@ -1,6 +1,8 @@
 // Auth middleware example
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { getSessionByToken } from '../repo/auth';
+import { UserRepo } from '../repo/user';
+import { UserService } from '../services/userService';
 
 export async function authMiddleware(
   request: FastifyRequest,
@@ -20,12 +22,14 @@ export async function authMiddleware(
     return reply.code(401).send({ error: 'Unauthorized' });
   }
 
-  // TODO: Implement user context retrieval
-  // const userContext = await getUserContext(sessionData.user_id);
-  // if (!userContext) {
-  //   return reply.code(401).send({ error: 'Unauthorized' });
-  // }
+  const userContext = await UserService.getUserContext(sessionData.userId);
+  if (!userContext) {
+    return reply.code(401).send({ error: 'Unauthorized' });
+  }
+
   (request as any).user = {
-    id: sessionData.userId,
-  }; // Placeholder
+    ...userContext,
+  };
+
+  console.log(userContext);
 }

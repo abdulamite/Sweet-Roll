@@ -1,20 +1,20 @@
 ### Get User by ID
-GET http://localhost:3000/users/3
+GET http://localhost:3000/users/4
 Content-Type: application/json
 
 ### Get All Users
 GET http://localhost:3000/users
 Content-Type: application/json
 
-# ### Create New User
-# POST http://localhost:3000/users
-# Content-Type: application/json
-
-# {
-#     "name": "Abdul",
-#     "email": "abdul123@gmail.com",
-#     "password": "yourpassword"
-# }
+### Create New User
+POST http://localhost:3000/users
+Content-Type: application/json
+    
+{
+    "name": "Abdul",
+    "email": "abdul123@gmail.com",
+    "password": "yourpassword"
+}
 
 ### Delete User by ID
 DELETE http://localhost:3000/users/2
@@ -24,8 +24,8 @@ POST http://localhost:3000/auth/login
 Content-Type: application/json
 
 {
-    "email": "abdulamite+1@gmail.com",
-    "password": "NewPassword123"
+    "email": "abdulamite@gmail.com",
+    "password": "H>)sGNfVYBT2P"
 }
 
 ### User logout
@@ -50,25 +50,18 @@ Content-Type: application/json
     },
     "businessOwnerInformation": {
         "name": "Abdul Alberto-Shaikh",
-        "email": "abdulamite+1@gmail.com",
+        "email": "abdulamite@gmail.com",
         "phone": "123-456-7890"
     }
 }
 
 ### Activate user account
-POST http://localhost:3000/users/4/activate
+POST http://localhost:3000/users/activate-account
 Content-Type: application/json
 
 {
-    "token": "Nuwxovm0Y"
-}
-
-### Create password for new user
-POST http://localhost:3000/users/4/password
-Content-Type: application/json
-
-{
-    "password": "NewPassword123"
+    "token": "bVHTXuSB4",
+    "password": "H>)sGNfVYBT2P"
 }
 
 ### Queue Health Check

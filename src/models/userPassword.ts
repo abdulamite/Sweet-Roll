@@ -1,5 +1,5 @@
-import { BaseModel } from './baseMode';
-export interface UserPassword extends BaseModel {
+export interface UserPassword {
+  id: number;
   userId: number;
   hashedPassword: string;
 }

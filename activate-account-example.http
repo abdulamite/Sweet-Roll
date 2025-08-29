@@ -1,0 +1,36 @@
+# Combined Account Activation + Password Creation
+# This is the new secure endpoint that requires token proof of email ownership
+
+POST http://localhost:3000/users/activate-account
+Content-Type: application/json
+
+{
+  "token": "your-activation-token-here",
+  "password": "newSecurePassword123"
+}
+
+###
+
+# Expected responses:
+
+# Success (200):
+# {
+#   "message": "Account activated and password set successfully",
+#   "userId": 123
+# }
+
+# Error examples:
+# 400 - Invalid/expired token:
+# {
+#   "error": "Invalid or expired activation token"
+# }
+
+# 400 - Already activated:
+# {
+#   "error": "Account already activated. Please use password reset if needed."
+# }
+
+# 400 - Validation errors:
+# {
+#   "error": "Password must be at least 8 characters long"
+# }

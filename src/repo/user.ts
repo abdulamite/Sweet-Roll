@@ -12,7 +12,7 @@ export interface UserCreationData {
   password?: string;
 }
 
-export class UserRepository {
+export class UserRepo {
   constructor(private db: PostgresJsDatabase) {}
 
   static async findById(id: number): Promise<User | null> {
@@ -23,9 +23,6 @@ export class UserRepository {
       id: user.id,
       name: user.name ?? '',
       email: user.email ?? '',
-      createdAt: user.createdAt ?? new Date(),
-      updatedAt: user.updatedAt ?? new Date(),
-      deletedAt: user.deletedAt ?? new Date(),
     };
   }
 
@@ -37,9 +34,6 @@ export class UserRepository {
       id: user.id,
       name: user.name ?? '',
       email: user.email ?? '',
-      createdAt: user.createdAt ?? new Date(),
-      updatedAt: user.updatedAt ?? new Date(),
-      deletedAt: user.deletedAt ?? new Date(),
     };
   }
 
@@ -49,9 +43,6 @@ export class UserRepository {
       id: user.id,
       name: user.name ?? '',
       email: user.email ?? '',
-      createdAt: user.createdAt ?? new Date(),
-      updatedAt: user.updatedAt ?? new Date(),
-      deletedAt: user.deletedAt ?? new Date(),
     }));
   }
 
@@ -86,9 +77,6 @@ export class UserRepository {
       id: newUser.id,
       name: newUser.name ?? '',
       email: newUser.email ?? '',
-      createdAt: newUser.createdAt ?? new Date(),
-      updatedAt: newUser.updatedAt ?? new Date(),
-      deletedAt: newUser.deletedAt ?? new Date(),
     };
   }
 }
@@ -96,10 +84,3 @@ export class UserRepository {
 export function hashUserPassword(password: string): string {
   return createHash('sha512').update(password).digest('hex');
 }
-
-// Backward compatibility exports - these delegate to the UserRepository methods
-export const getUserById = UserRepository.findById;
-export const getUserByEmail = UserRepository.findByEmail;
-export const getAllUsers = UserRepository.findAll;
-export const deleteUserById = UserRepository.deleteById;
-export const createNewUser = UserRepository.create;

@@ -15,7 +15,7 @@ export class AccountActivationTokensRepo {
     if (!schoolId) throw new Error('School ID is required');
 
     const plainToken = shortid.generate();
-    const hashedToken = await hashToken(plainToken);
+    const hashedToken = hashToken(plainToken);
 
     const [newAccountActivationToken] = await db
       .insert(accountActivationTokens)
@@ -40,7 +40,7 @@ export class AccountActivationTokensRepo {
     if (!accountActivationToken)
       throw new Error('Account activation token is required');
 
-    const hashedToken = await hashToken(accountActivationToken);
+    const hashedToken = hashToken(accountActivationToken);
 
     const activeTokens = await safeQuery
       .selectAccountActivationTokens()
@@ -63,6 +63,29 @@ export class AccountActivationTokensRepo {
 
   static async deleteToken(id: number): Promise<void> {
     const result = await softDelete.userActivationToken(id).returning();
+    if (result.length === 0) {
+      throw new Error('Failed to delete account activation token');
+    }
+  }
+
+  static async deleteTokenByValue(tokenValue: string): Promise<void> {
+    if (!tokenValue) throw new Error('Token value is required');
+
+    const hashedToken = hashToken(tokenValue);
+
+    // Find the token first
+    const tokens = await safeQuery
+      .selectAccountActivationTokens()
+      .where(eq(accountActivationTokens.token, hashedToken))
+      .limit(1);
+
+    if (tokens.length === 0) {
+      throw new Error('Token not found');
+    }
+
+    const result = await softDelete
+      .userActivationToken(tokens[0].id)
+      .returning();
     if (result.length === 0) {
       throw new Error('Failed to delete account activation token');
     }

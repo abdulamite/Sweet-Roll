@@ -3,6 +3,7 @@ import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { userSchools } from '../db/schema';
 import { safeQuery, softDelete } from '../db/queryBuilder';
 import { and, eq } from 'drizzle-orm';
+import { UserRepo } from './user';
 
 export class UserSchoolsRepo {
   constructor(private db: PostgresJsDatabase) {}
@@ -33,5 +34,13 @@ export class UserSchoolsRepo {
       )
       .execute();
     return true;
+  }
+
+  static async findByUserId(userId: number): Promise<any[]> {
+    if (!userId) throw new Error('User ID is required');
+
+    return await safeQuery
+      .selectUserSchools()
+      .where(eq(userSchools.userId, userId));
   }
 }

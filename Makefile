@@ -1,6 +1,3 @@
-# Makefile for Database Management
-# Usage: make <command>
-
 # Load environment variables from .env file if it exists
 ifneq (,$(wildcard .env))
     include .env

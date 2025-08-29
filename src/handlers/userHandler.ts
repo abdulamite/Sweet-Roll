@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { UserRepository, UserCreationData } from '../repo/user';
+import { UserRepo, UserCreationData } from '../repo/user';
 import { UserService } from '../services/userService';
+import { rawPasswordIsValid } from '../repo/userPasswords';
 
 export class UserHandler {
   /**
@@ -15,7 +16,7 @@ export class UserHandler {
         return reply.code(400).send({ error: 'Name and email are required' });
       }
 
-      const newUser = await UserRepository.create(userData);
+      const newUser = await UserRepo.create(userData);
       reply.code(201).send(newUser);
     } catch (error) {
       request.log.error(error);
@@ -35,7 +36,7 @@ export class UserHandler {
         return reply.code(400).send({ error: 'Valid user ID is required' });
       }
 
-      const user = await UserRepository.findById(Number(id));
+      const user = await UserRepo.findById(Number(id));
 
       if (!user) {
         return reply.code(404).send({ error: 'User not found' });
@@ -53,7 +54,7 @@ export class UserHandler {
    */
   static async getAllUsers(request: FastifyRequest, reply: FastifyReply) {
     try {
-      const users = await UserRepository.findAll();
+      const users = await UserRepo.findAll();
       reply.send(users);
     } catch (error) {
       request.log.error(error);
@@ -73,7 +74,7 @@ export class UserHandler {
         return reply.code(400).send({ error: 'Valid user ID is required' });
       }
 
-      const deleted = await UserRepository.deleteById(Number(id));
+      const deleted = await UserRepo.deleteById(Number(id));
 
       if (!deleted) {
         return reply.code(404).send({ error: 'User not found' });
@@ -86,38 +87,52 @@ export class UserHandler {
     }
   }
 
-  static async activateUser(request: FastifyRequest, reply: FastifyReply) {
+  /**
+   * Combined account activation and password creation
+   * Requires token + password - ensures user owns the email before setting password
+   */
+  static async activateAccountWithPassword(
+    request: FastifyRequest,
+    reply: FastifyReply
+  ) {
     try {
-      const { userId } = request.params as { userId: string };
-      const { token } = request.body as { token: string };
-
-      console.log(request.params);
+      const { token, password } = request.body as {
+        token: string;
+        password: string;
+      };
 
       // Validate input
-      if (!userId || isNaN(Number(userId))) {
-        return reply.code(400).send({ error: 'Valid user ID is required' });
-      }
-
       if (!token) {
         return reply.code(400).send({ error: 'Activation token is required' });
       }
 
-      // Activate user account
-      const isActivated = await UserService.activateUserAccount(
-        Number(userId),
-        token
-      );
-
-      if (!isActivated) {
-        return reply
-          .code(404)
-          .send({ error: 'User not found or already activated' });
+      if (!password) {
+        return reply.code(400).send({ error: 'Password is required' });
       }
 
-      reply.send({ message: 'User account activated successfully' });
+      const passwordIsValid = rawPasswordIsValid(password);
+      if (!passwordIsValid) {
+        return reply
+          .code(400)
+          .send({ error: 'Password does not meet requirements' });
+      }
+
+      const result = await UserService.activateAccountWithPassword(
+        token,
+        password
+      );
+
+      if (!result.success) {
+        return reply.code(400).send({ error: result.error });
+      }
+
+      reply.send({
+        message: 'Account activated and password set successfully',
+        userId: result.userId,
+      });
     } catch (error) {
       request.log.error(error);
-      reply.code(500).send({ error: 'Failed to activate user account' });
+      reply.code(500).send({ error: 'Failed to activate account' });
     }
   }
 

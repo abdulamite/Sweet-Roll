@@ -1,6 +1,15 @@
-import { BaseModel } from './baseMode';
+export interface SchoolBase {
+  id: number;
+  name: string;
+  phone: string;
+  website: string;
+  logo: string | null;
+  supportEmail: string;
+  onboardingStatus: 'pending' | 'completed' | 'in_progress';
+}
 
-export interface OnboardingFormDataSchool extends BaseModel {
+export interface OnboardingFormDataSchool {
+  id: number;
   name: string;
   phone: string;
   logo: string | null;

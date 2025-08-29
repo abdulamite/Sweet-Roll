@@ -6,6 +6,15 @@ import { UserPassword } from '../models/userPassword';
 import { hashUserPassword } from './user';
 import { eq } from 'drizzle-orm';
 
+export const passwordRules = {
+  minLength: 8,
+  maxLength: 100,
+  requireUppercase: true,
+  requireLowercase: true,
+  requireNumber: true,
+  requireSpecialCharacter: true,
+};
+
 export class UserPasswordRepo {
   constructor(private db: PostgresJsDatabase) {}
 
@@ -49,3 +58,26 @@ export class UserPasswordRepo {
     return true;
   }
 }
+
+export const rawPasswordIsValid = (password: string): boolean => {
+  if (!password) return false;
+
+  const {
+    minLength,
+    maxLength,
+    requireUppercase,
+    requireLowercase,
+    requireNumber,
+    requireSpecialCharacter,
+  } = passwordRules;
+
+  if (password.length < minLength || password.length > maxLength) return false;
+
+  if (requireUppercase && !/[A-Z]/.test(password)) return false;
+  if (requireLowercase && !/[a-z]/.test(password)) return false;
+  if (requireNumber && !/[0-9]/.test(password)) return false;
+  if (requireSpecialCharacter && !/[!@#$%^&*(),.?":{}|<>]/.test(password))
+    return false;
+
+  return true;
+};

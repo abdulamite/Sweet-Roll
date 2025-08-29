@@ -4,7 +4,7 @@ import {
   OnboardingFormDataSchool as School,
   SCHOOL_ONBOARDING_STATUS,
 } from '../models/school';
-import { UserRepository, UserCreationData } from '../repo/user';
+import { UserRepo, UserCreationData } from '../repo/user';
 import {
   users,
   userSchools,
@@ -101,9 +101,6 @@ export class OnboardingService {
           email: '',
           phone: '',
         },
-        createdAt: newSchool.createdAt ?? new Date(),
-        updatedAt: newSchool.updatedAt ?? new Date(),
-        deletedAt: newSchool.deletedAt ?? new Date(),
         address: newSchoolAddress
           ? {
               street: newSchoolAddress.street ?? '',
@@ -155,7 +152,7 @@ export class OnboardingService {
     schoolId: number
   ): Promise<User> {
     // Check if user already exists
-    const existingUser = await UserRepository.findByEmail(userData.email);
+    const existingUser = await UserRepo.findByEmail(userData.email);
     if (existingUser) {
       throw new Error('User with this email already exists.');
     }
@@ -179,9 +176,6 @@ export class OnboardingService {
       id: newUser.id,
       name: newUser.name ?? '',
       email: newUser.email ?? '',
-      createdAt: newUser.createdAt ?? new Date(),
-      updatedAt: newUser.updatedAt ?? new Date(),
-      deletedAt: newUser.deletedAt ?? new Date(),
     };
   }
 
@@ -201,7 +195,7 @@ export class OnboardingService {
     // TODO: Implement actual business logic to check onboarding completion
     // This could check various flags in the database, user profile completeness, etc.
 
-    const user = await UserRepository.findById(userId);
+    const user = await UserRepo.findById(userId);
     if (!user) {
       throw new Error('User not found');
     }

@@ -1,9 +1,37 @@
+import { inArray } from 'drizzle-orm';
 import { db } from '../db';
 import { schools, schoolAddress, schoolOwner } from '../db/schema';
 import {
+  SchoolBase,
   OnboardingFormDataSchool as School,
   SCHOOL_ONBOARDING_STATUS,
 } from '../models/school';
+
+export class SchoolRepo {
+  static async findByIds(ids: number[]): Promise<SchoolBase[]> {
+    if (!Array.isArray(ids) || ids.length === 0) return [];
+
+    const results = await db
+      .select()
+      .from(schools)
+      .where(inArray(schools.id, ids))
+      .execute();
+
+    // Map DB results to SchoolBase[]
+    return results.map(row => ({
+      id: row.id,
+      name: row.name ?? '',
+      phone: row.phone ?? '',
+      website: row.website ?? '',
+      logo: row.logo ?? null,
+      supportEmail: row.supportEmail ?? '',
+      onboardingStatus: (row.onboardingStatus ?? 'pending') as
+        | 'pending'
+        | 'completed'
+        | 'in_progress',
+    }));
+  }
+}
 
 export const createNewSchool = async (
   schoolData: Omit<School, 'id'>
